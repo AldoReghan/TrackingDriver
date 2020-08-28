@@ -67,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.only(top: 30, left: 30, right: 30),
                     child: GestureDetector(
                       onTap: () {
-                       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                        builder: (context) => Home()), (route) => false);
+                       Navigator.of(context).push(MaterialPageRoute(
+                         builder: (context)=> Home()));
                       },
                       child: Container(
                         height: 50,

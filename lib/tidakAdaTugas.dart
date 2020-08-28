@@ -18,47 +18,6 @@ class _TidakAdaTugasState extends State<TidakAdaTugas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Pekerjaan anda"),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            Container(
-              height: 210,
-              child: DrawerHeader(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      "Aldo Reghan Ramadhan",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "08509089799809",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    )
-                  ],
-                )
-              ),
-              color: Colors.blue,
-            )
-          ],
-        ),
-      ),
       body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
