@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tracking_driver/terimaTugas.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
+import 'package:tracking_driver/tugasAktif.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -141,6 +142,7 @@ class _HomeState extends State<Home> {
                 ),
               ),  
             ),
+            // SizedBox(height: MediaQuery.of(context).size.height/14,),
             Padding(
               padding: EdgeInsets.only(top: 70, left: 16, right: 16),
               child: GestureDetector(
@@ -230,7 +232,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => TerimaTugas()));
+              .push(MaterialPageRoute(builder: (context) => TugasAktif()));
         },
         child: Icon(Icons.navigate_next),
       ),
