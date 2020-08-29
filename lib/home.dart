@@ -18,6 +18,39 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  
+  int status = 0;
+
+  cekStatus(){
+    if (status == 0) {
+      return Scaffold(
+        body: TidakAdaTugas(),
+      );
+    }else if(status == 1){
+      return Scaffold(
+        body: TerimaTugas(),
+      );
+    }else{
+      return Scaffold(
+        body: TugasAktif(),
+      );
+    }
+  }
+
+  change(){
+    status = status + 1;
+    if(status == 3){
+      return status = 0;
+    }
+    print(status);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    cekStatus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,7 +220,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: TidakAdaTugas(),
+      body:cekStatus(),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(
@@ -231,10 +264,11 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => TugasAktif()));
+          setState(() {
+            change();
+          });
         },
-        child: Icon(Icons.navigate_next),
+        child: Icon(Icons.chat_bubble),
       ),
     );
   }

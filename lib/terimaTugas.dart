@@ -179,17 +179,14 @@ class _TerimaTugasState extends State<TerimaTugas> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Pekerjaan anda"),
-          centerTitle: true,
-        ),
         body: SingleChildScrollView(
             child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                  height: MediaQuery.of(context).size.height / 1.2,
+                // color: Colors.red,
+                  height: MediaQuery.of(context).size.height / 1.3,
                   child: ListView(
                     children: [
                       Padding(

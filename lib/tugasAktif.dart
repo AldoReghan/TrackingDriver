@@ -316,10 +316,6 @@ class _TugasAktifState extends State<TugasAktif> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Pekerjaan Anda"),
-        centerTitle: true,
-      ),
       body: Stepper(
         steps: [
           Step(
