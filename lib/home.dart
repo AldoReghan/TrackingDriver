@@ -18,21 +18,22 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  
+
+  var loading = false;  
   int status = 0;
 
   cekStatus(){
     if (status == 0) {
       return Scaffold(
-        body: TidakAdaTugas(),
+        body: TidakAdaTugas(value: status,),
       );
     }else if(status == 1){
       return Scaffold(
-        body: TerimaTugas(),
+        body: TerimaTugas(value: status,),
       );
-    }else{
+    }else if(status == 2){
       return Scaffold(
-        body: TugasAktif(),
+        body: TugasAktif(value: status,),
       );
     }
   }
@@ -48,7 +49,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      loading = true;
+    });
     cekStatus();
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -220,7 +227,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body:cekStatus(),
+      body:loading ? Center(child: CircularProgressIndicator(),) : cekStatus(),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(

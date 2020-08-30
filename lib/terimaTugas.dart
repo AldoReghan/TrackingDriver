@@ -10,6 +10,8 @@ class MyApp extends StatelessWidget {
 }
 
 class TerimaTugas extends StatefulWidget {
+  int value;
+  TerimaTugas({this.value});
   @override
   _TerimaTugasState createState() => _TerimaTugasState();
 }
