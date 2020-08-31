@@ -130,6 +130,9 @@ class _TerimaTugasState extends State<TerimaTugas> {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        setState(() {
+                          // widget.value = 1;
+                        });
                         Navigator.of(context).pop();
                       },
                       child: Container(
@@ -172,7 +175,6 @@ class _TerimaTugasState extends State<TerimaTugas> {
             );
         });
   }
-
   @override
   void initState() {
     super.initState();

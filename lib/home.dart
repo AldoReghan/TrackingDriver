@@ -259,7 +259,10 @@ class _HomeState extends State<Home> {
                         Icons.note_add,
                         color: Colors.blue,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context)=>TerimaTugas()));
+                      },
                     ),
                     Text("Jadwal Tugas")
                   ],
