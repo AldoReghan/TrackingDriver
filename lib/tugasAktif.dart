@@ -586,7 +586,7 @@ class _TugasAktifState extends State<TugasAktif> {
       switch (number) {
       case 1:
         return Scaffold(
-            body: Padding(
+          body: Padding(
           padding: EdgeInsets.all(16),
           child: antarBawa(),
         ));

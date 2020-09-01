@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:tracking_driver/login.dart';
+import 'package:tracking_driver/model/driverDataModel.dart';
 import 'package:tracking_driver/model/driverModel.dart';
 import 'package:tracking_driver/terimaTugas.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
@@ -26,7 +27,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   var loading = false;  
-  int status = 0;
+  int status = 2;
+  final list = List<DriverDataModel>();
 
   SharedPreferences sharedPreferences;
 
@@ -37,6 +39,7 @@ class _HomeState extends State<Home> {
       "Id" : id.toString()
     });
     final data = jsonDecode(response.body)['data'];
+    list.add(data);
     final type = data['Type'];
     print(type);
     print(data);
@@ -47,7 +50,9 @@ class _HomeState extends State<Home> {
     if (sharedPreferences.get('Id') == null) {
       return false;
     }else{
-      getData();
+      // getData();
+      final type = sharedPreferences.getInt("Type");
+      print(type);
       return true;
     }
   }
@@ -105,7 +110,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        name != null ? name : "Nama",
+                        name != null ? name : CircularProgressIndicator(),
                         style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
@@ -237,7 +242,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: status == 0 ? TidakAdaTugas() : TerimaTugas(),
+      body: TugasAktif(),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(
@@ -284,7 +289,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          getData();
+          // getData();
         },
         child: Icon(Icons.chat_bubble),
       ),
