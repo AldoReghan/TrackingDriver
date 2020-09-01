@@ -57,12 +57,58 @@ class _TugasAktifState extends State<TugasAktif> {
     return "Success!";
   }
 
-  updateStatus()async{
+  buttonCek(){
+    if(status == 1){
+     return GestureDetector(
+                onTap: () => showDialogBawaMuatan(),
+                child:  Container(
+                  margin: EdgeInsets.only(top: 10),
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Text(
+                      "Apakah anda sudah sampai tujuan ?",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+              );
+    } else if(status == 3){
+      return GestureDetector(
+                onTap: () => showDialogBawaMuatan(),
+                child:  Container(
+                  margin: EdgeInsets.only(top: 10),
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Text(
+                      "Apakah anda sudah sampai tujuan ?",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+              );
+    }
+  }
+
+  updateStatus(String message)async{
     final response = await http.post("http://app.rasc.id/log/api/driver/changestatus", body: {
       "DriverId" : driverId.toString(),
       "OrderId" : orderId.toString(),
       "Status" : status.toString(),
-      "Message" : "Driver telah mengangkut barang"
+      "Message" : message
     });
     final data = jsonDecode(response.body);
     print(data);
@@ -77,6 +123,7 @@ class _TugasAktifState extends State<TugasAktif> {
       print(id);
     }
   }
+
 
   showDialogAmbilMuatan() {
     return showDialog(
@@ -248,8 +295,22 @@ class _TugasAktifState extends State<TugasAktif> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
+                        String rondo;
                         status = status + 1;
-                        updateStatus();
+                        if (status == 2){
+                          rondo = "Driver telah mengangkut barang";
+                          updateStatus(rondo);
+                        } else if(status == 3){
+                          rondo = "Driver telah Sampai Tujuan";
+                          updateStatus(rondo);
+                        } else if(status == 4){
+                          rondo = "Barang Sudah Sampai Tujuan";
+                          updateStatus(rondo);
+                        }  else if(status == 5){
+                          rondo = "Barang Sudah Diturunkan";
+                          updateStatus(rondo);
+                        }                         
+                        
                       });
                       Navigator.of(context).pop();
                     },
@@ -415,9 +476,9 @@ class _TugasAktifState extends State<TugasAktif> {
                     "2020920920909",
                     style: TextStyle(color: Colors.blue),
                   )),
-              GestureDetector(
+              status == 1 ?GestureDetector(
                 onTap: () => showDialogBawaMuatan(),
-                child: Container(
+                child:  Container(
                   margin: EdgeInsets.only(top: 10),
                   height: 50,
                   decoration: BoxDecoration(
@@ -434,7 +495,160 @@ class _TugasAktifState extends State<TugasAktif> {
                     ),
                   ),
                 ),
+              ) : Container()
+
+
+
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  antarBawa2() {
+    return Container(
+      height: 475,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.blue)),
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Alamat",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
+              Text(
+                "${data[0]['TujuanBarang']}",
+                style: TextStyle(color: Colors.grey),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 5),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.navigation,
+                      color: Colors.blue,
+                    ),
+                    Text(
+                      "Lihat peta",
+                      style: TextStyle(color: Colors.blue),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "Detail :",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(child: Text("No.Resi: " + "${data[0]['NoResi']}")),
+              Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "Pesan Admin :",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 2),
+                  child: Text(
+                     "${data[0]['Message']}" ,
+                    style: TextStyle(color: Colors.red),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "${data[0]['WaktuPenjemputan']}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 2),
+                  child: Text(
+                    "Anda harus sampai 1 jam 55 menit lagi",
+                    style: TextStyle(color: Colors.grey),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(
+                    "Rabu, 28 Agustus 2020, 14:13",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "Nomor Kontak",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("${data[0]['NamaPengirim']}"),
+                            Text("${data[0]['NoPengirim']}"),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      Icon(Icons.phone),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Icon(Icons.chat)
+                    ],
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    "Apakah anda sudah sampai ?",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(
+                    "Berikan leading code anda kepada petugas/security di tempat tujuan",
+                    style: TextStyle(color: Colors.grey),
+                  )),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(
+                    "2020920920909",
+                    style: TextStyle(color: Colors.blue),
+                  )),
+              status == 3 ?GestureDetector(
+                onTap: () => showDialogBawaMuatan(),
+                child:  Container(
+                  margin: EdgeInsets.only(top: 10),
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Text(
+                      "Apakah anda sudah sampai tujuan ?",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ) : Container()
+
+
+
+
             ],
           ),
         ),
@@ -505,9 +719,9 @@ class _TugasAktifState extends State<TugasAktif> {
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-              GestureDetector(
-                onTap: () => showDialogNaikMuatan(),
-                child: Container(
+              GestureDetector( 
+                onTap: () => showDialogBawaMuatan(),
+                child: status == 2 ? Container(
                   margin: EdgeInsets.only(top: 30),
                   height: 50,
                   decoration: BoxDecoration(
@@ -524,7 +738,7 @@ class _TugasAktifState extends State<TugasAktif> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
-                ),
+                ) : Container(),
               ),
             ],
           ),
@@ -680,7 +894,7 @@ class _TugasAktifState extends State<TugasAktif> {
                 SizedBox(
                   height: 20,
                 ),
-                antarBawa(),
+                antarBawa2(),
               ],
             ),
           ),
@@ -701,7 +915,7 @@ class _TugasAktifState extends State<TugasAktif> {
                 SizedBox(
                   height: 20,
                 ),
-                antarBawa(),
+                antarBawa2(),
                 SizedBox(
                   height: 20,
                 ),
@@ -726,7 +940,7 @@ class _TugasAktifState extends State<TugasAktif> {
                 SizedBox(
                   height: 20,
                 ),
-                antarBawa(),
+                antarBawa2(),
                 SizedBox(
                   height: 20,
                 ),

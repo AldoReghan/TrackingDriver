@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
       return Scaffold(body: TidakAdaTugas(),);
     } else if (data[0]['Status'] == 0) {
       return Scaffold(body: TerimaTugas(),);
-    } else if (data[0]['Status'] == 1) {
+    } else if (data[0]['Status'] > 0) {
       return Scaffold(body: TugasAktif(),);
     }
   }
