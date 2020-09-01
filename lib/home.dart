@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tracking_driver/login.dart';
 import 'package:tracking_driver/model/driverDataModel.dart';
-import 'package:tracking_driver/model/driverModel.dart';
 import 'package:tracking_driver/terimaTugas.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
 import 'package:tracking_driver/tugasAktif.dart';
@@ -46,10 +45,9 @@ class _HomeState extends State<Home> {
     );
     setState((){
       final name = sharedPreferences.getString('Name');
-      
       data = json.decode(response.body);
+
       return name22 = name;
-      print(data[0]['Status']);
     });
     return "Success!";
   }
@@ -65,11 +63,8 @@ class _HomeState extends State<Home> {
   }
   @override
   void initState() {
-     cekLogin();
-    
-   
-    // TODO: implement initState
     super.initState();
+    cekLogin();
   }
   Future<void>  onRefres() async{
     getData();
@@ -81,9 +76,7 @@ class _HomeState extends State<Home> {
     if (sharedPreferences.get('Id') == null) {
       return false;
     }else{
-      
       getData();
-      // getData();
       final type = sharedPreferences.getInt("Type");
       print(type);
       return true;
@@ -98,10 +91,7 @@ class _HomeState extends State<Home> {
   }
 
   @override
-
-  @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: Text("Pekerjaan Anda"),

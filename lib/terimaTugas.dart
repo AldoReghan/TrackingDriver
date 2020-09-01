@@ -7,6 +7,7 @@ import 'home.dart';
 import 'home.dart';
 import 'tidakAdaTugas.dart';
 import 'tidakAdaTugas.dart';
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -24,47 +25,49 @@ class TerimaTugas extends StatefulWidget {
 }
 
 class _TerimaTugasState extends State<TerimaTugas> {
+  
   SharedPreferences sharedPreferences;
   List data;
-   Future<String> getData() async{
-     sharedPreferences = await SharedPreferences.getInstance();
+
+  Future<String> getData() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
     http.Response response = await http.post(
-      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),body:{
-      "Id" : id.toString(),
-      "IsDone" : "0"
-    },
-      
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),
+      body: {"Id": id.toString(), "IsDone": "0"},
     );
-    setState((){
+    setState(() {
       data = json.decode(response.body);
     });
     return "Success!";
   }
-  updateStatus() async{
-     sharedPreferences = await SharedPreferences.getInstance();
+
+  updateStatus() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
     http.Response response = await http.post(
-      Uri.encodeFull("http://app.rasc.id/log/api/driver/changestatus"),body:{
-      "DriverId" : id.toString(),
-      "OrderId" : data[0]['OrderId'].toString(),
-      "Status" : "1",
-      "Message" : "Driver Sudah Mengkonfirmasi",
-    },
-      
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/changestatus"),
+      body: {
+        "DriverId": id.toString(),
+        "OrderId": data[0]['OrderId'].toString(),
+        "Status": "1",
+        "Message": "Driver Sudah Mengkonfirmasi",
+      },
     );
     setState(() {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Home()), (route) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Home()), (route) => false);
     });
     print(response.body);
     return "Success!";
   }
+
   @override
-  void initState() { 
+  void initState() {
     getData();
     super.initState();
-    
   }
+
   _dialogAccept() {
     showDialog(
         context: context,
@@ -264,8 +267,6 @@ class _TerimaTugasState extends State<TerimaTugas> {
           );
         });
   }
-
-  @override
 
   @override
   Widget build(BuildContext context) {

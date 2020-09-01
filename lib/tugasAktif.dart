@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
 import 'package:tracking_driver/uploadFoto.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,16 +16,14 @@ class MyApp extends StatelessWidget {
 }
 
 class TugasAktif extends StatefulWidget {
-  int value;
-  TugasAktif({this.value});
   @override
   _TugasAktifState createState() => _TugasAktifState();
 }
 
 class _TugasAktifState extends State<TugasAktif> {
+  
   int currentStep = 0;
   bool complete = false;
-  int number = 1;
 
   // status 0 : belum berangkat
   // status 1 : berangkat
@@ -29,6 +31,52 @@ class _TugasAktifState extends State<TugasAktif> {
   // status 3 : barang termuat
   // status 4 : antar ketujuan
   // status 5 : selesai
+
+  SharedPreferences sharedPreferences;
+  List data;
+
+  int status;
+  int driverId;
+  int orderId;
+
+  Future<String> getData() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    int id = sharedPreferences.get('Id');
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),
+      body: {"Id": id.toString(), "IsDone": "0"},
+    );
+    setState(() {
+      data = jsonDecode(response.body);
+      status = data[0]['Status'];
+      driverId = data[0]['DriverId'];
+      orderId = data[0]['OrderId'];
+    });
+    print(data);
+    print("ini status " + status.toString());
+    return "Success!";
+  }
+
+  updateStatus()async{
+    final response = await http.post("http://app.rasc.id/log/api/driver/changestatus", body: {
+      "DriverId" : driverId.toString(),
+      "OrderId" : orderId.toString(),
+      "Status" : status.toString(),
+      "Message" : "Driver telah mengangkut barang"
+    });
+    final data = jsonDecode(response.body);
+    print(data);
+  }
+
+  cekDriverId()async{
+    sharedPreferences = await SharedPreferences.getInstance();
+    final id = sharedPreferences.get("Id");
+    if (id == null) {
+      print("id kosong");
+    }else{
+      print(id);
+    }
+  }
 
   showDialogAmbilMuatan() {
     return showDialog(
@@ -114,7 +162,7 @@ class _TugasAktifState extends State<TugasAktif> {
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    number == 2 ? "1. Barang sudah dimuat" : "1. Barang sudah diturunkan",
+                    status == 1 ? "1. Barang sudah dimuat" : "1. Barang sudah diturunkan",
                     textAlign: TextAlign.center,
                   ),
                   Text(
@@ -200,7 +248,8 @@ class _TugasAktifState extends State<TugasAktif> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        number = number + 1;
+                        status = status + 1;
+                        updateStatus();
                       });
                       Navigator.of(context).pop();
                     },
@@ -266,7 +315,7 @@ class _TugasAktifState extends State<TugasAktif> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                "Kampung warna-warni malang, jalan malang nggone nang malang",
+                "${data[0]['TujuanBarang']}",
                 style: TextStyle(color: Colors.grey),
               ),
               Container(
@@ -290,7 +339,7 @@ class _TugasAktifState extends State<TugasAktif> {
                     "Detail :",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )),
-              Container(child: Text("No. 10")),
+              Container(child: Text("No.Resi: " + "${data[0]['NoResi']}")),
               Container(
                   margin: EdgeInsets.only(top: 10),
                   child: Text(
@@ -300,13 +349,13 @@ class _TugasAktifState extends State<TugasAktif> {
               Container(
                   margin: EdgeInsets.only(top: 2),
                   child: Text(
-                    "Harus cepet ya",
+                     "${data[0]['Message']}" ,
                     style: TextStyle(color: Colors.red),
                   )),
               Container(
                   margin: EdgeInsets.only(top: 10),
                   child: Text(
-                    "Waktu",
+                    "${data[0]['WaktuPenjemputan']}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   )),
               Container(
@@ -335,8 +384,8 @@ class _TugasAktifState extends State<TugasAktif> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("BSA Toko"),
-                            Text("085734542356"),
+                            Text("${data[0]['NamaPengirim']}"),
+                            Text("${data[0]['NoPengirim']}"),
                           ],
                         ),
                       ),
@@ -420,7 +469,7 @@ class _TugasAktifState extends State<TugasAktif> {
               Container(
                 margin: EdgeInsets.only(top: 10),
                 child: Text(
-                  number == 2 ? "Apa yang diangkut?" : "Apa yang diturunkan?",
+                  status == 2 ? "Apa yang diangkut?" : "Apa yang diturunkan?",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -577,13 +626,21 @@ class _TugasAktifState extends State<TugasAktif> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getData();
+    cekDriverId();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (number == 6) {
+    print(status);
+    if (status == 6) {
       return Scaffold(
         body: TidakAdaTugas(),
       );
     }else{
-      switch (number) {
+      switch (status) {
       case 1:
         return Scaffold(
           body: Padding(
