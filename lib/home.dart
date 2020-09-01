@@ -24,58 +24,62 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
-  var loading = false;  
+  var loading = false;
   int status = 2;
   final list = List<DriverDataModel>();
-  
+
   SharedPreferences sharedPreferences;
-  String name22 ;
-  
+  String name22;
   List data;
-   Future<String> getData() async{
-     sharedPreferences = await SharedPreferences.getInstance();
+
+  Future<String> getData() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
     http.Response response = await http.post(
-      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),body:{
-      "Id" : id.toString(),
-      "IsDone" : "0"
-    },
-      
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),
+      body: {"Id": id.toString(), "IsDone": "0"},
     );
-    setState((){
+    setState(() {
       final name = sharedPreferences.getString('Name');
       data = json.decode(response.body);
+      print(data[0]['Photo']);
 
-      return name22 = name;
+      name22 = name;
     });
     return "Success!";
   }
-  
-  cekMenu(){
-    if(data == null){
-      return Scaffold(body: TidakAdaTugas(),);
+
+  cekMenu() {
+    if (data == null) {
+      return Scaffold(
+        body: TidakAdaTugas(),
+      );
     } else if (data[0]['Status'] == 0) {
-      return Scaffold(body: TerimaTugas(),);
+      return Scaffold(
+        body: TerimaTugas(),
+      );
     } else if (data[0]['Status'] > 0) {
-      return Scaffold(body: TugasAktif(),);
+      return Scaffold(
+        body: TugasAktif(),
+      );
     }
   }
+
   @override
   void initState() {
     super.initState();
     cekLogin();
   }
-  Future<void>  onRefres() async{
+
+  Future<void> onRefres() async {
     getData();
   }
 
-  cekLogin()async{
-    
+  cekLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.get('Id') == null) {
       return false;
-    }else{
+    } else {
       getData();
       final type = sharedPreferences.getInt("Type");
       print(type);
@@ -83,11 +87,11 @@ class _HomeState extends State<Home> {
     }
   }
 
-  logoutDriver(){
+  logoutDriver() {
     sharedPreferences.clear();
     sharedPreferences.commit();
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+        MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
   }
 
   @override
@@ -109,6 +113,8 @@ class _HomeState extends State<Home> {
                 children: [
                   CircleAvatar(
                     radius: 50,
+                    // child: Image.network(
+                    //   "http://app.rasc.id/log/api/driver/getdata/"+"${data[0]['Photo']}"),
                   ),
                   SizedBox(
                     height: 10,
@@ -121,15 +127,14 @@ class _HomeState extends State<Home> {
               padding: EdgeInsets.all(8),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.blue)
-                ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.blue)),
                 child: Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        name22 != null ? name22 : CircularProgressIndicator(),
+                        name22 == null ? CircularProgressIndicator() : name22,
                         style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
@@ -153,7 +158,8 @@ class _HomeState extends State<Home> {
                           Text(
                             "Saldo : Rp.",
                             style: TextStyle(
-                                color: Colors.black, fontWeight: FontWeight.bold),
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
                           ),
                           Text(
                             "5.000.000",
@@ -166,15 +172,14 @@ class _HomeState extends State<Home> {
                     )
                   ],
                 ),
-              ),  
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(8),
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.blue)
-                ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.blue)),
                 child: Column(
                   children: [
                     Padding(
@@ -212,7 +217,7 @@ class _HomeState extends State<Home> {
                     )
                   ],
                 ),
-              ),  
+              ),
             ),
             // SizedBox(height: MediaQuery.of(context).size.height/14,),
             Padding(
@@ -228,8 +233,7 @@ class _HomeState extends State<Home> {
                     child: Text(
                       "Lihat histori pengiriman",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ),
                 ),
@@ -251,8 +255,7 @@ class _HomeState extends State<Home> {
                     child: Text(
                       "Ganti Driver",
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue),
+                          fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                   ),
                 ),
@@ -295,7 +298,7 @@ class _HomeState extends State<Home> {
                       ),
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context)=>TerimaTugas()));
+                            builder: (context) => TerimaTugas()));
                       },
                     ),
                     Text("Jadwal Tugas")

@@ -21,7 +21,6 @@ class TugasAktif extends StatefulWidget {
 }
 
 class _TugasAktifState extends State<TugasAktif> {
-  
   int currentStep = 0;
   bool complete = false;
 
@@ -38,6 +37,7 @@ class _TugasAktifState extends State<TugasAktif> {
   int status;
   int driverId;
   int orderId;
+  String messageAdmin;
 
   Future<String> getData() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -51,79 +51,80 @@ class _TugasAktifState extends State<TugasAktif> {
       status = data[0]['Status'];
       driverId = data[0]['DriverId'];
       orderId = data[0]['OrderId'];
+      // messageAdmin = data[0]['Message'];
     });
     print(data);
     print("ini status " + status.toString());
     return "Success!";
   }
 
-  buttonCek(){
-    if(status == 1){
-     return GestureDetector(
-                onTap: () => showDialogBawaMuatan(),
-                child:  Container(
-                  margin: EdgeInsets.only(top: 10),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah anda sudah sampai tujuan ?",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              );
-    } else if(status == 3){
+  buttonCek() {
+    if (status == 1) {
       return GestureDetector(
-                onTap: () => showDialogBawaMuatan(),
-                child:  Container(
-                  margin: EdgeInsets.only(top: 10),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah anda sudah sampai tujuan ?",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              );
+        onTap: () => showDialogBawaMuatan(),
+        child: Container(
+          margin: EdgeInsets.only(top: 10),
+          height: 50,
+          decoration: BoxDecoration(
+              color: Colors.blue,
+              border: Border.all(
+                color: Colors.blue,
+              ),
+              borderRadius: BorderRadius.circular(10)),
+          child: Center(
+            child: Text(
+              "Apakah anda sudah sampai tujuan ?",
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    } else if (status == 3) {
+      return GestureDetector(
+        onTap: () => showDialogBawaMuatan(),
+        child: Container(
+          margin: EdgeInsets.only(top: 10),
+          height: 50,
+          decoration: BoxDecoration(
+              color: Colors.blue,
+              border: Border.all(
+                color: Colors.blue,
+              ),
+              borderRadius: BorderRadius.circular(10)),
+          child: Center(
+            child: Text(
+              "Apakah anda sudah sampai tujuan ?",
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+        ),
+      );
     }
   }
 
-  updateStatus(String message)async{
-    final response = await http.post("http://app.rasc.id/log/api/driver/changestatus", body: {
-      "DriverId" : driverId.toString(),
-      "OrderId" : orderId.toString(),
-      "Status" : status.toString(),
-      "Message" : message
+  updateStatus(String message) async {
+    final response = await http
+        .post("http://app.rasc.id/log/api/driver/changestatus", body: {
+      "DriverId": driverId.toString(),
+      "OrderId": orderId.toString(),
+      "Status": status.toString(),
+      "Message": message
     });
     final data = jsonDecode(response.body);
     print(data);
   }
 
-  cekDriverId()async{
+  cekDriverId() async {
     sharedPreferences = await SharedPreferences.getInstance();
     final id = sharedPreferences.get("Id");
     if (id == null) {
       print("id kosong");
-    }else{
+    } else {
       print(id);
     }
   }
-
 
   showDialogAmbilMuatan() {
     return showDialog(
@@ -209,7 +210,9 @@ class _TugasAktifState extends State<TugasAktif> {
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    status == 1 ? "1. Barang sudah dimuat" : "1. Barang sudah diturunkan",
+                    status == 1
+                        ? "1. Barang sudah dimuat"
+                        : "1. Barang sudah diturunkan",
                     textAlign: TextAlign.center,
                   ),
                   Text(
@@ -297,20 +300,19 @@ class _TugasAktifState extends State<TugasAktif> {
                       setState(() {
                         String rondo;
                         status = status + 1;
-                        if (status == 2){
+                        if (status == 2) {
                           rondo = "Driver telah mengangkut barang";
                           updateStatus(rondo);
-                        } else if(status == 3){
+                        } else if (status == 3) {
                           rondo = "Driver telah Sampai Tujuan";
                           updateStatus(rondo);
-                        } else if(status == 4){
+                        } else if (status == 4) {
                           rondo = "Barang Sudah Sampai Tujuan";
                           updateStatus(rondo);
-                        }  else if(status == 5){
+                        } else if (status == 5) {
                           rondo = "Barang Sudah Diturunkan";
                           updateStatus(rondo);
-                        }                         
-                        
+                        }
                       });
                       Navigator.of(context).pop();
                     },
@@ -359,7 +361,7 @@ class _TugasAktifState extends State<TugasAktif> {
 
   antarBawa() {
     return Container(
-      height: 475,
+      height: status == 1 ? 475 : 400,
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
@@ -410,7 +412,8 @@ class _TugasAktifState extends State<TugasAktif> {
               Container(
                   margin: EdgeInsets.only(top: 2),
                   child: Text(
-                     "${data[0]['Message']}" ,
+                    // "${data[0]['Message']}",
+                    "Harus cepat ya",
                     style: TextStyle(color: Colors.red),
                   )),
               Container(
@@ -476,39 +479,39 @@ class _TugasAktifState extends State<TugasAktif> {
                     "2020920920909",
                     style: TextStyle(color: Colors.blue),
                   )),
-              status == 1 ?GestureDetector(
-                onTap: () => showDialogBawaMuatan(),
-                child:  Container(
-                  margin: EdgeInsets.only(top: 10),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
+              status == 1
+                  ? GestureDetector(
+                      onTap: () => showDialogBawaMuatan(),
+                      child: Container(
+                        margin: EdgeInsets.only(top: 10),
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            border: Border.all(
+                              color: Colors.blue,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
+                          child: Text(
+                            "Apakah anda sudah sampai tujuan ?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah anda sudah sampai tujuan ?",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ) : Container()
-
-
-
-
+                    )
+                  : Container( height: 1,)
             ],
           ),
         ),
       ),
     );
   }
+
   antarBawa2() {
     return Container(
-      height: 475,
+      height: status == 3 ? 475 : 400,
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
@@ -559,7 +562,8 @@ class _TugasAktifState extends State<TugasAktif> {
               Container(
                   margin: EdgeInsets.only(top: 2),
                   child: Text(
-                     "${data[0]['Message']}" ,
+                    // "${data[0]['Message']}",
+                    "Harus cepat ya",
                     style: TextStyle(color: Colors.red),
                   )),
               Container(
@@ -625,30 +629,29 @@ class _TugasAktifState extends State<TugasAktif> {
                     "2020920920909",
                     style: TextStyle(color: Colors.blue),
                   )),
-              status == 3 ?GestureDetector(
-                onTap: () => showDialogBawaMuatan(),
-                child:  Container(
-                  margin: EdgeInsets.only(top: 10),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
+              status == 3
+                  ? GestureDetector(
+                      onTap: () => showDialogBawaMuatan(),
+                      child: Container(
+                        margin: EdgeInsets.only(top: 10),
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            border: Border.all(
+                              color: Colors.blue,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
+                          child: Text(
+                            "Apakah anda sudah sampai tujuan ?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah anda sudah sampai tujuan ?",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ) : Container()
-
-
-
-
+                    )
+                  : Container( height: 1,)
             ],
           ),
         ),
@@ -658,7 +661,7 @@ class _TugasAktifState extends State<TugasAktif> {
 
   angkutTurun() {
     return Container(
-      height: 300,
+      height: status == 2 ? 300 : 200,
       child: Container(
         width: 500,
         decoration: BoxDecoration(
@@ -719,26 +722,123 @@ class _TugasAktifState extends State<TugasAktif> {
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-              GestureDetector( 
+              GestureDetector(
                 onTap: () => showDialogBawaMuatan(),
-                child: status == 2 ? Container(
-                  margin: EdgeInsets.only(top: 30),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah anda sudah menurunkan muatan ?",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ) : Container(),
+                child: status == 2
+                    ? Container(
+                        margin: EdgeInsets.only(top: 30),
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            border: Border.all(
+                              color: Colors.blue,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
+                          child: Text(
+                            "Apakah anda sudah menurunkan muatan ?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : Container( height: 1,)
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  angkutTurun2() {
+    return Container(
+      height: status == 4 ? 300 : 200,
+      child: Container(
+        width: 500,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.blue)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  child: Text(
+                "Kode leading anda",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(
+                    "202020202020",
+                    style: TextStyle(color: Colors.red),
+                  )),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: Text(
+                  status == 2 ? "Apa yang diangkut?" : "Apa yang diturunkan?",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Text(
+                    "1 other semen 0",
+                    style: TextStyle(color: Colors.grey),
+                  )),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Kapan?",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 5),
+                child: Text("Anda telah menurunkan barang",
+                    style: TextStyle(color: Colors.grey)),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 5),
+                child: Text(
+                  "Jumat, 28 Agustus 2020, 17:20",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: Text(
+                  "*jangan lupa untuk minta surat jalan fisik",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => showDialogBawaMuatan(),
+                child: status == 4
+                    ? Container(
+                        margin: EdgeInsets.only(top: 30),
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            border: Border.all(
+                              color: Colors.blue,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
+                          child: Text(
+                            "Apakah anda sudah menurunkan muatan ?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : Container( height: 1,),
               ),
             ],
           ),
@@ -853,109 +953,109 @@ class _TugasAktifState extends State<TugasAktif> {
       return Scaffold(
         body: TidakAdaTugas(),
       );
-    }else{
+    } else {
       switch (status) {
-      case 1:
-        return Scaffold(
-          body: Padding(
-          padding: EdgeInsets.all(16),
-          child: antarBawa(),
-        ));
-        break;
-      case 2:
-        return Scaffold(
-            body: SingleChildScrollView(
-          child: Padding(
+        case 1:
+          return Scaffold(
+              body: Padding(
             padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                antarBawa(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun()
-              ],
+            child: antarBawa(),
+          ));
+          break;
+        case 2:
+          return Scaffold(
+              body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  antarBawa2(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun()
+                ],
+              ),
             ),
-          ),
-        ));
-        break;
-      case 3:
-        return Scaffold(
-            body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                antarBawa(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun(),
-                SizedBox(
-                  height: 20,
-                ),
-                antarBawa2(),
-              ],
+          ));
+          break;
+        case 3:
+          return Scaffold(
+              body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  antarBawa(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  antarBawa2(),
+                ],
+              ),
             ),
-          ),
-        ));
-        break;
-      case 4:
-        return Scaffold(
-            body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                antarBawa(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun(),
-                SizedBox(
-                  height: 20,
-                ),
-                antarBawa2(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun()
-              ],
+          ));
+          break;
+        case 4:
+          return Scaffold(
+              body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  antarBawa(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  antarBawa2(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun2()
+                ],
+              ),
             ),
-          ),
-        ));
-        break;
-      case 5:
-        return Scaffold(
-            body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                antarBawa(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun(),
-                SizedBox(
-                  height: 20,
-                ),
-                antarBawa2(),
-                SizedBox(
-                  height: 20,
-                ),
-                angkutTurun(),
-                SizedBox(
-                  height: 20,
-                ),
-                uploadFoto()
-              ],
+          ));
+          break;
+        case 5:
+          return Scaffold(
+              body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  antarBawa(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  antarBawa2(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  angkutTurun(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  uploadFoto()
+                ],
+              ),
             ),
-          ),
-        ));
-        break;
-      default:
-    }
+          ));
+          break;
+        default:
+      }
     }
   }
 }

@@ -3,7 +3,6 @@ import 'package:tracking_driver/home.dart';
 import 'package:tracking_driver/login.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tracking_driver/model/driverModel.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,9 +36,9 @@ class _MainHomeState extends State<MainHome> {
   ceklogin()async{
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getInt("Id") == null) {
-      setState(() {
-        _isloggedin = false;
-      });
+      // setState(() {
+      //   _isloggedin = false;
+      // });
       print("anda belum login");
     }else{
       setState(() {
