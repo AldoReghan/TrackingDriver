@@ -1,5 +1,14 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'model/driverDataModel.dart';
+import 'terimaTugas.dart';
+import 'tugasAktif.dart';
+import 'tugasAktif.dart';
+import 'tugasAktif.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -17,10 +26,12 @@ class TidakAdaTugas extends StatefulWidget {
 }
 
 class _TidakAdaTugasState extends State<TidakAdaTugas> {
+  final list = List<DriverDataModel>();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body:  Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -40,7 +51,9 @@ class _TidakAdaTugasState extends State<TidakAdaTugas> {
               )
             ],
           ),
-        ),
-    );
+        ) ,
+     );
+    
+    
   }
 }

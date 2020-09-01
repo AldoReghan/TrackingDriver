@@ -1,5 +1,12 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
+import 'home.dart';
+import 'home.dart';
+import 'tidakAdaTugas.dart';
+import 'tidakAdaTugas.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -17,6 +24,47 @@ class TerimaTugas extends StatefulWidget {
 }
 
 class _TerimaTugasState extends State<TerimaTugas> {
+  SharedPreferences sharedPreferences;
+  List data;
+   Future<String> getData() async{
+     sharedPreferences = await SharedPreferences.getInstance();
+    int id = sharedPreferences.get('Id');
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),body:{
+      "Id" : id.toString(),
+      "IsDone" : "0"
+    },
+      
+    );
+    setState((){
+      data = json.decode(response.body);
+    });
+    return "Success!";
+  }
+  updateStatus() async{
+     sharedPreferences = await SharedPreferences.getInstance();
+    int id = sharedPreferences.get('Id');
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/changestatus"),body:{
+      "DriverId" : id.toString(),
+      "OrderId" : data[0]['OrderId'].toString(),
+      "Status" : "1",
+      "Message" : "Driver Sudah Mengkonfirmasi",
+    },
+      
+    );
+    setState(() {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Home()), (route) => false);
+    });
+    print(response.body);
+    return "Success!";
+  }
+  @override
+  void initState() { 
+    getData();
+    super.initState();
+    
+  }
   _dialogAccept() {
     showDialog(
         context: context,
@@ -47,7 +95,7 @@ class _TerimaTugasState extends State<TerimaTugas> {
                       ),
                     ),
                     Text(
-                      "Harus cepat ya",
+                      "${data[0]['Catatan']}",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.red),
                     ),
@@ -61,14 +109,14 @@ class _TerimaTugasState extends State<TerimaTugas> {
                       ),
                     ),
                     Text(
-                      "Sabtu, 29 Agustus 2020",
+                      "${data[0]['WaktuPenjemputan']}",
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey),
                     ),
                     Container(
                       margin: EdgeInsets.only(top: 10),
                       child: Text(
-                        "AB 2178 RV",
+                        "${data[0]['Licesnse']}",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.black, fontWeight: FontWeight.bold),
@@ -94,21 +142,21 @@ class _TerimaTugasState extends State<TerimaTugas> {
                         child: Column(
                           children: [
                             Text(
-                              "Null",
+                              "${data[0]['NamaPengirim']} | ${data[0]['NoPengirim']}",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              "Kopi Rempong",
+                              "${data[0]['PenjemputanBarang']}",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              "Jl. Buduran siwalan panji",
+                              "",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
@@ -138,21 +186,21 @@ class _TerimaTugasState extends State<TerimaTugas> {
                         child: Column(
                           children: [
                             Text(
-                              "Null",
+                              "${data[0]['NamaPenerima']} | ${data[0]['NoPenerima']}",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              "Kopi Rempong",
+                              "${data[0]['TujuanBarang']}",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              "Jl. Buduran siwalan panji",
+                              "",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
@@ -171,9 +219,7 @@ class _TerimaTugasState extends State<TerimaTugas> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        // widget.value = 1;
-                      });
+                      updateStatus();
                       Navigator.of(context).pop();
                     },
                     child: Container(
@@ -220,9 +266,6 @@ class _TerimaTugasState extends State<TerimaTugas> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

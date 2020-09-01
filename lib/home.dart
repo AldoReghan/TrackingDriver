@@ -29,27 +29,60 @@ class _HomeState extends State<Home> {
   var loading = false;  
   int status = 2;
   final list = List<DriverDataModel>();
-
+  
   SharedPreferences sharedPreferences;
-
-  getData()async{
-    sharedPreferences = await SharedPreferences.getInstance();
+  String name22 ;
+  
+  List data;
+   Future<String> getData() async{
+     sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
-    final response = await http.post("http://app.rasc.id/log/api/driver/getdata", body: {
-      "Id" : id.toString()
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),body:{
+      "Id" : id.toString(),
+      "IsDone" : "0"
+    },
+      
+    );
+    setState((){
+      final name = sharedPreferences.getString('Name');
+      
+      data = json.decode(response.body);
+      return name22 = name;
+      print(data[0]['Status']);
     });
-    final data = jsonDecode(response.body)['data'];
-    list.add(data);
-    final type = data['Type'];
-    print(type);
-    print(data);
+    return "Success!";
+  }
+  
+  cekMenu(){
+    if(data == null){
+      return Scaffold(body: TidakAdaTugas(),);
+    } else if (data[0]['Status'] == 0) {
+      return Scaffold(body: TerimaTugas(),);
+    } else if (data[0]['Status'] == 1) {
+      return Scaffold(body: TugasAktif(),);
+    }
+  }
+  @override
+  void initState() {
+     cekLogin();
+    
+   
+    // TODO: implement initState
+    super.initState();
+  }
+  Future<void>  onRefres() async{
+    getData();
   }
 
   cekLogin()async{
+    
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.get('Id') == null) {
       return false;
     }else{
+      
+      getData();
       // getData();
       final type = sharedPreferences.getInt("Type");
       print(type);
@@ -65,14 +98,10 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    cekLogin();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final name = sharedPreferences.get("Name");
+    
     return Scaffold(
       appBar: AppBar(
         title: Text("Pekerjaan Anda"),
@@ -110,7 +139,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        name != null ? name : CircularProgressIndicator(),
+                        name22 != null ? name22 : CircularProgressIndicator(),
                         style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
@@ -242,7 +271,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body: TugasAktif(),
+      body: cekMenu(),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(
