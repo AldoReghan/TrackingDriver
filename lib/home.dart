@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:tracking_driver/login.dart';
+import 'package:tracking_driver/model/driverModel.dart';
 import 'package:tracking_driver/terimaTugas.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
 import 'package:tracking_driver/tugasAktif.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class MyApp extends StatelessWidget {
   @override
@@ -22,47 +28,49 @@ class _HomeState extends State<Home> {
   var loading = false;  
   int status = 0;
 
-  cekStatus(){
-    if (status == 0) {
-      return Scaffold(
-        body: TidakAdaTugas(value: status,),
-      );
-    }else if(status == 1){
-      return Scaffold(
-        body: TerimaTugas(value: status,),
-      );
-    }else if(status == 2){
-      return Scaffold(
-        body: TugasAktif(value: status,),
-      );
+  SharedPreferences sharedPreferences;
+
+  getData()async{
+    sharedPreferences = await SharedPreferences.getInstance();
+    int id = sharedPreferences.get('Id');
+    final response = await http.post("http://app.rasc.id/log/api/driver/getdata", body: {
+      "Id" : id.toString()
+    });
+    final data = jsonDecode(response.body)['data'];
+    final type = data['Type'];
+    print(type);
+    print(data);
+  }
+
+  cekLogin()async{
+    sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.get('Id') == null) {
+      return false;
+    }else{
+      getData();
+      return true;
     }
   }
 
-  change(){
-    status = status + 1;
-    if(status == 3){
-      return status = 0;
-    }
-    print(status);
+  logoutDriver(){
+    sharedPreferences.clear();
+    sharedPreferences.commit();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
   }
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      loading = true;
-    });
-    cekStatus();
-    setState(() {
-      loading = false;
-    });
+    cekLogin();
   }
 
   @override
   Widget build(BuildContext context) {
+    final name = sharedPreferences.get("Name");
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pekerjaan anda"),
+        title: Text("Pekerjaan Anda"),
         centerTitle: true,
       ),
       drawer: Drawer(
@@ -97,7 +105,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "Nama Driver",
+                        name != null ? name : "Nama",
                         style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
@@ -206,7 +214,9 @@ class _HomeState extends State<Home> {
             Padding(
               padding: EdgeInsets.only(top: 10, left: 16, right: 16),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  logoutDriver();
+                },
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
@@ -227,7 +237,7 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      body:loading ? Center(child: CircularProgressIndicator(),) : cekStatus(),
+      body: status == 0 ? TidakAdaTugas() : TerimaTugas(),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(
@@ -274,9 +284,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            change();
-          });
+          getData();
         },
         child: Icon(Icons.chat_bubble),
       ),
