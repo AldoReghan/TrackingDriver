@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:async/async.dart';
+import 'package:path/path.dart' as path;
 
 class MyApp extends StatelessWidget {
   @override
@@ -21,29 +23,64 @@ class UploadSrtJl extends StatefulWidget {
 class _UploadSrtJlState extends State<UploadSrtJl> {
   File _imageFilePO, _imageFileSrt;
 
+  uploadImage()async{
+    try {
+
+      var streamPO = http.ByteStream(DelegatingStream.typed(_imageFilePO.openRead()));
+      var streamSrt = http.ByteStream(DelegatingStream.typed(_imageFilePO.openRead()));
+      
+      var lengthPO = await _imageFilePO.length();
+      var lengthSrt = await _imageFileSrt.length();
+      
+      var uri = Uri.parse("http://app.rasc.id/log/api/driver/uploadimage");
+      var request = http.MultipartRequest("POST", uri);
+
+      request.files.add(http.MultipartFile("PO_PHOTO", streamPO, lengthPO, filename: path.basename(_imageFilePO.path)));
+      request.files.add(http.MultipartFile("SuratJalan_Photo", streamSrt, lengthSrt, filename: path.basename(_imageFileSrt.path)));
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("Buku berhasil diinputkan");
+        setState(() {
+          Navigator.of(context).pop();
+        });
+      }else{
+        print("gagal input foto");
+      }
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
   pilihKameraPO() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var image = await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 1920.0,
+      maxWidth: 1080.0);
     setState(() {
       _imageFilePO = image;
     });
   }
 
   pilihGalleryPO() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery, maxHeight: 1920.0,
+      maxWidth: 1080.0);
     setState(() {
       _imageFilePO = image;
     });
   }
 
   pilihKameraSrt() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var image = await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 1920.0,
+      maxWidth: 1080.0);
     setState(() {
       _imageFileSrt = image;
     });
   }
 
   pilihGallerySrt() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery, maxHeight: 1920.0,
+      maxWidth: 1080.0);
     setState(() {
       _imageFileSrt = image;
     });
@@ -139,14 +176,6 @@ class _UploadSrtJlState extends State<UploadSrtJl> {
         });
   }
 
-  uploadFoto()async{
-    try{
-      // var stream = http.ByteStream(Deleg)
-    } catch(e){
-
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,6 +210,7 @@ class _UploadSrtJlState extends State<UploadSrtJl> {
                   child: Text("Upload surat jalan"),
                 ),
                 InkWell(
+                  onTap: () => dialogPilihSrt(),
                   child: _imageFileSrt == null
                       ? Container(
                           height: MediaQuery.of(context).size.height / 1.8,
@@ -195,24 +225,21 @@ class _UploadSrtJlState extends State<UploadSrtJl> {
                 Padding(
                   padding: EdgeInsets.only(top: 20, left: 10, right: 10),
                   child: GestureDetector(
-                    onTap: () {
-                      // Navigator.of(context).push(
-                      //     MaterialPageRoute(builder: (context) => Home()));
-                    },
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.lightBlue,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                        child: Text(
-                          "UPLOAD FOTO",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
+                      onTap: () => uploadImage(),
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.lightBlue,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(
+                          child: Text(
+                            "UPLOAD FOTO",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ),
               ],
             ),

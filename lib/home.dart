@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 
 import 'terimaTugas.dart';
 import 'tidakAdaTugas.dart';
+import 'tidakAdaTugas.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -60,11 +61,10 @@ class _HomeState extends State<Home> {
       return Container(child: TidakAdaTugas());
     } else if (data[0]['Status'] == 0) {
       return Container(child: TerimaTugas());
-    } else if (data[0]['Status'] > 0) {
+    } else if (data[0]['Status'] > 0 && data[0]['Status'] < 6 ) {
       return Container(child: TugasAktif());
-   
     } else {
-      Container();
+      return Container(child: TidakAdaTugas(),);
     }
   }
   cekLogin() async {

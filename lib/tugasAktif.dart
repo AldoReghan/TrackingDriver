@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:tracking_driver/uploadSrtJl.dart';
 
+import 'tidakAdaTugas.dart';
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -42,52 +44,50 @@ class _TugasAktifState extends State<TugasAktif> {
   int orderId;
   String messageAdmin;
   String _currentPosition;
-  
+
   static double lat = -6.105735647265721;
   static double lat2 = 106.88647985458374;
 
   ///MAPS LAUNCHER
   final sepgans = Coords(lat, lat2);
-cekmaps()async{
-  final availableMaps = await MapLauncher.installedMaps;
-  print(availableMaps);
+  cekmaps() async {
+    final availableMaps = await MapLauncher.installedMaps;
+    print(availableMaps);
 
-await availableMaps.first.showMarker(
-  coords: sepgans,
-  title: "Ocean Beach",
-);
-if (await MapLauncher.isMapAvailable(MapType.google)) {
-  await MapLauncher.showMarker(
-    mapType: MapType.google,
-    coords: sepgans,
-    title: "title",
-    description: "description",
-  );
- }
-}
+    await availableMaps.first.showMarker(
+      coords: sepgans,
+      title: "Ocean Beach",
+    );
+    if (await MapLauncher.isMapAvailable(MapType.google)) {
+      await MapLauncher.showMarker(
+        mapType: MapType.google,
+        coords: sepgans,
+        title: "title",
+        description: "description",
+      );
+    }
+  }
 
-
-
-  getLocation(){
+  getLocation() {
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-    .then((Position position){
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
       setState(() {
         _currentPosition = position.toString();
         if (_currentPosition != null) {
           print(_currentPosition);
         }
       });
-    }).catchError((e){
+    }).catchError((e) {
       print(e);
     });
   }
 
-  updateLanglit()async{
-    final response = await http.post("http://app.rasc.id/log/api/driver/getlocation", body: {
-      "DriverId" : driverId.toString(),
-      "LangLit" : _currentPosition
-    });
+  updateLanglit() async {
+    final response = await http.post(
+        "http://app.rasc.id/log/api/driver/getlocation",
+        body: {"DriverId": driverId.toString(), "LangLit": _currentPosition});
     jsonDecode(response.body);
   }
 
@@ -216,6 +216,11 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                           rondo = "Barang Sudah Diturunkan";
                           updateStatus(rondo);
                           updateLanglit();
+                        }else{
+                          status = status + 1;
+                          rondo = "Tugas telah selesai";
+                          updateStatus(rondo);
+                          updateLanglit();
                         }
                       });
                       Navigator.of(context).pop();
@@ -286,10 +291,10 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                 style: TextStyle(color: Colors.grey),
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   cekmaps();
                 },
-                              child: Container(
+                child: Container(
                   margin: EdgeInsets.only(top: 5),
                   child: Row(
                     children: [
@@ -314,10 +319,10 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                 style: TextStyle(color: Colors.grey),
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   cekmaps();
                 },
-                              child: Container(
+                child: Container(
                   margin: EdgeInsets.only(top: 5),
                   child: Row(
                     children: [
@@ -438,7 +443,9 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                         ),
                       ),
                     )
-                  : Container( height: 1,)
+                  : Container(
+                      height: 1,
+                    )
             ],
           ),
         ),
@@ -588,7 +595,9 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                         ),
                       ),
                     )
-                  : Container( height: 1,)
+                  : Container(
+                      height: 1,
+                    )
             ],
           ),
         ),
@@ -660,29 +669,30 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                 ),
               ),
               GestureDetector(
-                onTap: () => showDialogBawaMuatan(),
-                child: status == 2
-                    ? Container(
-                        margin: EdgeInsets.only(top: 30),
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: Colors.blue,
-                            border: Border.all(
+                  onTap: () => showDialogBawaMuatan(),
+                  child: status == 2
+                      ? Container(
+                          margin: EdgeInsets.only(top: 30),
+                          height: 50,
+                          decoration: BoxDecoration(
                               color: Colors.blue,
+                              border: Border.all(
+                                color: Colors.blue,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Center(
+                            child: Text(
+                              "Apakah anda sudah menurunkan muatan ?",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Center(
-                          child: Text(
-                            "Apakah anda sudah menurunkan muatan ?",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
                           ),
-                        ),
-                      )
-                    : Container( height: 1,)
-              ),
+                        )
+                      : Container(
+                          height: 1,
+                        )),
             ],
           ),
         ),
@@ -775,7 +785,9 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                           ),
                         ),
                       )
-                    : Container( height: 1,),
+                    : Container(
+                        height: 1,
+                      ),
               ),
             ],
           ),
@@ -795,32 +807,6 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "PO Number / Order Number :",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => UploadFoto())),
-                child: Container(
-                  margin: EdgeInsets.only(top: 20),
-                  height: 50,
-                  decoration: BoxDecoration(
-                      color: Colors.blue,
-                      border: Border.all(
-                        color: Colors.blue,
-                      ),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      "Apakah ada tambahan biaya ?",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
               SizedBox(
                 height: 20,
               ),
@@ -829,9 +815,9 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               GestureDetector(
-                onTap: (){
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context)=>UploadSrtJl()));
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => UploadSrtJl()));
                 },
                 child: Container(
                   margin: EdgeInsets.only(top: 20),
@@ -844,7 +830,7 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                       borderRadius: BorderRadius.circular(10)),
                   child: Center(
                     child: Text(
-                      "Upload surat jalan",
+                      "Upload surat jalan dan PO",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
@@ -859,21 +845,24 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
                 "Tekan tombol dibawah ini jika sudah menambahakan foto pod dan biaya tambahan",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 20),
-                height: 50,
-                decoration: BoxDecoration(
-                    color: Colors.blue,
-                    border: Border.all(
+              GestureDetector(
+                onTap: () => showDialogBawaMuatan(),
+                child: Container(
+                  margin: EdgeInsets.only(top: 20),
+                  height: 50,
+                  decoration: BoxDecoration(
                       color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Text(
+                      "Ya, tugas sudah selesai",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Center(
-                  child: Text(
-                    "Ya, tugas sudah selesai",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
@@ -882,110 +871,112 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
         ));
   }
 
-  caseretu(){
+  caseretu() {
     switch (status) {
-        case 1:
-          return Scaffold(
-              body: Padding(
+      case 1:
+        return Scaffold(
+            body: Padding(
+          padding: EdgeInsets.all(16),
+          child: antarBawa(),
+        ));
+        break;
+      case 2:
+        return Scaffold(
+            body: SingleChildScrollView(
+          child: Padding(
             padding: EdgeInsets.all(16),
-            child: antarBawa(),
-          ));
-          break;
-        case 2:
-          return Scaffold(
-              body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  antarBawa2(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun()
-                ],
-              ),
+            child: Column(
+              children: [
+                antarBawa2(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun()
+              ],
             ),
-          ));
-          break;
-        case 3:
-          return Scaffold(
-              body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  antarBawa(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  antarBawa2(),
-                ],
-              ),
+          ),
+        ));
+        break;
+      case 3:
+        return Scaffold(
+            body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                antarBawa(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun(),
+                SizedBox(
+                  height: 20,
+                ),
+                antarBawa2(),
+              ],
             ),
-          ));
-          break;
-        case 4:
-          return Scaffold(
-              body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  antarBawa(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  antarBawa2(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun2()
-                ],
-              ),
+          ),
+        ));
+        break;
+      case 4:
+        return Scaffold(
+            body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                antarBawa(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun(),
+                SizedBox(
+                  height: 20,
+                ),
+                antarBawa2(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun2()
+              ],
             ),
-          ));
-          break;
-        case 5:
-          return Scaffold(
-              body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  antarBawa(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  antarBawa2(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  angkutTurun(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  uploadFoto()
-                ],
-              ),
+          ),
+        ));
+        break;
+      case 5:
+        return Scaffold(
+            body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                antarBawa(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun(),
+                SizedBox(
+                  height: 20,
+                ),
+                antarBawa2(),
+                SizedBox(
+                  height: 20,
+                ),
+                angkutTurun(),
+                SizedBox(
+                  height: 20,
+                ),
+                uploadFoto()
+              ],
             ),
-          ));
-          break;
-        default:
-      }
+          ),
+        ));
+        break;
+      default:
+        return TidakAdaTugas();
+    }
   }
+
   @override
   void initState() {
     super.initState();
@@ -997,9 +988,7 @@ if (await MapLauncher.isMapAvailable(MapType.google)) {
   Widget build(BuildContext context) {
     print(status);
     return Container(
-        child: caseretu(),
+      child: caseretu(),
     );
-    
   }
 }
-
