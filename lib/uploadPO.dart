@@ -37,15 +37,15 @@ class _UploadFotoState extends State<UploadFoto> {
     });
   }
 
-  startUpload(){
-    if(null == tmpFile){
+  startUpload() {
+    if (null == tmpFile) {
       return "gagal upload";
     }
     String fileName = tmpFile.path.split('/').last;
     upload(fileName);
   }
 
-  upload(String fileName){
+  upload(String fileName) {
     http.post("url");
   }
 
@@ -62,11 +62,10 @@ class _UploadFotoState extends State<UploadFoto> {
             child: Column(
               children: [
                 Container(
-                        height: MediaQuery.of(context).size.height / 1.8,
-                        decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(10)))
-                ,
+                    height: MediaQuery.of(context).size.height / 1.8,
+                    decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10))),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
