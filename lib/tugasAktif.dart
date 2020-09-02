@@ -43,12 +43,11 @@ class _TugasAktifState extends State<TugasAktif> {
   String messageAdmin;
   String _currentPosition;
   
-  double lat = -6.105735647265721;
-  double lat2 = -6.105735647265721;
-  
+  static double lat = -6.105735647265721;
+  static double lat2 = 106.88647985458374;
 
   ///MAPS LAUNCHER
-  final sepgans = Coords(-6.105735647265721, 106.88647985458374);
+  final sepgans = Coords(lat, lat2);
 cekmaps()async{
   final availableMaps = await MapLauncher.installedMaps;
   print(availableMaps);
