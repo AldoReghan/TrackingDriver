@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
 import 'package:tracking_driver/uploadPO.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,32 @@ class _TugasAktifState extends State<TugasAktif> {
   int orderId;
   String messageAdmin;
   String _currentPosition;
+  
+  double lat = -6.105735647265721;
+  double lat2 = -6.105735647265721;
+  
+
+  ///MAPS LAUNCHER
+  final sepgans = Coords(-6.105735647265721, 106.88647985458374);
+cekmaps()async{
+  final availableMaps = await MapLauncher.installedMaps;
+  print(availableMaps);
+
+await availableMaps.first.showMarker(
+  coords: sepgans,
+  title: "Ocean Beach",
+);
+if (await MapLauncher.isMapAvailable(MapType.google)) {
+  await MapLauncher.showMarker(
+    mapType: MapType.google,
+    coords: sepgans,
+    title: "title",
+    description: "description",
+  );
+ }
+}
+
+
 
   getLocation(){
     final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -239,7 +266,7 @@ class _TugasAktifState extends State<TugasAktif> {
 
   antarBawa() {
     return Container(
-      height: status == 1 ? 475 : 400,
+      height: status == 1 ? 475 : 475,
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
@@ -252,26 +279,59 @@ class _TugasAktifState extends State<TugasAktif> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Alamat",
+                "Alamat Tujuan Barang",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
                 "${data[0]['TujuanBarang']}",
                 style: TextStyle(color: Colors.grey),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.navigation,
-                      color: Colors.blue,
-                    ),
-                    Text(
-                      "Lihat peta",
-                      style: TextStyle(color: Colors.blue),
-                    )
-                  ],
+              GestureDetector(
+                onTap: (){
+                  cekmaps();
+                },
+                              child: Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.navigation,
+                        color: Colors.blue,
+                      ),
+                      Text(
+                        "Lihat peta",
+                        style: TextStyle(color: Colors.blue),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Text(
+                "Alamat Penjemputan Barang",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "${data[0]['TujuanBarang']}",
+                style: TextStyle(color: Colors.grey),
+              ),
+              GestureDetector(
+                onTap: (){
+                  cekmaps();
+                },
+                              child: Container(
+                  margin: EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.navigation,
+                        color: Colors.blue,
+                      ),
+                      Text(
+                        "Lihat peta",
+                        style: TextStyle(color: Colors.blue),
+                      )
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -823,22 +883,8 @@ class _TugasAktifState extends State<TugasAktif> {
         ));
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getData();
-    cekDriverId();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print(status);
-    if (status == 6) {
-      return Scaffold(
-        body: TidakAdaTugas(),
-      );
-    } else {
-      switch (status) {
+  caseretu(){
+    switch (status) {
         case 1:
           return Scaffold(
               body: Padding(
@@ -940,6 +986,21 @@ class _TugasAktifState extends State<TugasAktif> {
           break;
         default:
       }
-    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    getData();
+    cekDriverId();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print(status);
+    return Container(
+        child: caseretu(),
+    );
+    
   }
 }
+

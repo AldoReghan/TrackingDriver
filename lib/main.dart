@@ -35,7 +35,7 @@ class MainHome extends StatefulWidget {
 class _MainHomeState extends State<MainHome> {
 
   SharedPreferences sharedPreferences;
-  bool _isloggedin = true;
+  bool _isloggedin ;
   String _currentPosition;
   int driverId;
   List data;
@@ -45,13 +45,15 @@ class _MainHomeState extends State<MainHome> {
     geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
     .then((Position position){
       setState(() {
-        _currentPosition = position.toString();
+        _currentPosition = "${position.latitude}, ${position.longitude}";
         if (_currentPosition != null) {
           print(_currentPosition);
+          getData();
+          
         }
       });
     }).catchError((e){
-      print(e);
+      //print(e);
     });
   }
 
@@ -68,16 +70,22 @@ class _MainHomeState extends State<MainHome> {
       print("driver id "+driverId.toString());
       print("langlit " + _currentPosition.toString());
       print(id);
+      updateLanglit();
+      
     });
     return "Success!";
   }
 
-  updateLanglit()async{
-    final response = await http.post("http://app.rasc.id/log/api/driver/getlocation", body: {
-      "DriverId" : driverId.toString(),
-      "LangLit" : _currentPosition
-    });
-    jsonDecode(response.body);
+updateLanglit() async {
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getlocation"),
+      body: {
+        "DriverId" : driverId.toString(),
+        "LangLit" : _currentPosition.toString(),
+      },
+    );
+    print(response.body);
+    return "Success!";
   }
 
   ceklogin()async{
@@ -91,9 +99,10 @@ class _MainHomeState extends State<MainHome> {
       setState(() {
         _isloggedin = true;
       });
-      getData();
       getLocation();
-      updateLanglit();
+      
+      
+      
       print("anda sudah login");
     }
   }
@@ -104,8 +113,7 @@ class _MainHomeState extends State<MainHome> {
     ceklogin();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  sepMantap(){
     switch (_isloggedin) {
       case true:
         return Scaffold(
@@ -117,5 +125,10 @@ class _MainHomeState extends State<MainHome> {
           body: LoginPage(),
         );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: Container(child: sepMantap(),));
   }
 }

@@ -9,6 +9,9 @@ import 'package:tracking_driver/tugasAktif.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'terimaTugas.dart';
+import 'tidakAdaTugas.dart';
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -35,33 +38,47 @@ class _HomeState extends State<Home> {
   Future<String> getData() async {
     sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
+
     http.Response response = await http.post(
       Uri.encodeFull("http://app.rasc.id/log/api/driver/getdata"),
       body: {"Id": id.toString(), "IsDone": "0"},
     );
     setState(() {
-      final name = sharedPreferences.getString('Name');
+      //final name = sharedPreferences.getString('Name');
       data = json.decode(response.body);
-      print(data[0]['Photo']);
+          print("cok iki data cekmenu");
+    print(data[0]['photo']);
 
-      name22 = name;
+      //print(data[0]['Photo']);
     });
     return "Success!";
   }
 
   cekMenu() {
+    
     if (data == null) {
-      return Scaffold(
-        body: TidakAdaTugas(),
-      );
+      return Container(child: TidakAdaTugas());
     } else if (data[0]['Status'] == 0) {
-      return Scaffold(
-        body: TerimaTugas(),
-      );
+      return Container(child: TerimaTugas());
     } else if (data[0]['Status'] > 0) {
-      return Scaffold(
-        body: TugasAktif(),
-      );
+      return Container(child: TugasAktif());
+   
+    } else {
+      Container();
+    }
+  }
+  cekLogin() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    print('septiangansbet');
+    print(sharedPreferences.get('Id').toString());
+    if (sharedPreferences.get('Id') == null) {
+      return false;
+    } else {
+      
+      final type = sharedPreferences.getInt("Type");
+      //print(type);
+      getData();
+      return true;
     }
   }
 
@@ -75,17 +92,7 @@ class _HomeState extends State<Home> {
     getData();
   }
 
-  cekLogin() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    if (sharedPreferences.get('Id') == null) {
-      return false;
-    } else {
-      getData();
-      final type = sharedPreferences.getInt("Type");
-      print(type);
-      return true;
-    }
-  }
+  
 
   logoutDriver() {
     sharedPreferences.clear();
@@ -101,7 +108,7 @@ class _HomeState extends State<Home> {
         title: Text("Pekerjaan Anda"),
         centerTitle: true,
       ),
-      drawer: Drawer(
+      drawer: data != null ? Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -113,8 +120,8 @@ class _HomeState extends State<Home> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    child: Image.network(
-                      "http://app.rasc.id/log/"+"${data[0]['Photo']}"),
+                    child:  Image.network(
+                      "http://app.rasc.id/log/${data[0]['Photo']}"),
                   ),
                   SizedBox(
                     height: 10,
@@ -263,8 +270,8 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-      ),
-      body: cekMenu(),
+      ) : CircularProgressIndicator(),
+      body: Container(child: cekMenu(),),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(
