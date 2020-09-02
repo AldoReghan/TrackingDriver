@@ -113,8 +113,8 @@ class _HomeState extends State<Home> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    // child: Image.network(
-                    //   "http://app.rasc.id/log/api/driver/getdata/"+"${data[0]['Photo']}"),
+                    child: Image.network(
+                      "http://app.rasc.id/log/"+"${data[0]['Photo']}"),
                   ),
                   SizedBox(
                     height: 10,

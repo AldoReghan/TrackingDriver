@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:tracking_driver/tidakAdaTugas.dart';
-import 'package:tracking_driver/uploadFoto.dart';
+import 'package:tracking_driver/uploadPO.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:tracking_driver/uploadSrtJl.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -921,21 +922,27 @@ class _TugasAktifState extends State<TugasAktif> {
                 "*Pastikan surat jalan sudah ditandatangani penerima",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 20),
-                height: 50,
-                decoration: BoxDecoration(
-                    color: Colors.blue,
-                    border: Border.all(
+              GestureDetector(
+                onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context)=>UploadSrtJl()));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: 20),
+                  height: 50,
+                  decoration: BoxDecoration(
                       color: Colors.blue,
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: Text(
+                      "Upload surat jalan",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Center(
-                  child: Text(
-                    "Upload surat jalan",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
               ),
