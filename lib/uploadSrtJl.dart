@@ -19,34 +19,132 @@ class UploadSrtJl extends StatefulWidget {
 }
 
 class _UploadSrtJlState extends State<UploadSrtJl> {
-  Future<File> file;
-  String status = '';
-  String base64Image;
-  File tmpFile;
-  String errMessage = 'Error Uploading Image';
+  File _imageFilePO, _imageFileSrt;
 
-  Future getImageCamera() async {
+  pilihKameraPO() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {
-      file = ImagePicker.pickImage(source: ImageSource.camera);
+      _imageFilePO = image;
     });
   }
 
-  Future getImageGallery() async {
+  pilihGalleryPO() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
-      file = ImagePicker.pickImage(source: ImageSource.gallery);
+      _imageFilePO = image;
     });
   }
 
-  startUpload() {
-    if (null == tmpFile) {
-      return "gagal upload";
+  pilihKameraSrt() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    setState(() {
+      _imageFileSrt = image;
+    });
+  }
+
+  pilihGallerySrt() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _imageFileSrt = image;
+    });
+  }
+
+  dialogPilihPO() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: ListView(
+              padding: EdgeInsets.all(20),
+              shrinkWrap: true,
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    "Silahkan Pilih gambar",
+                    style:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    InkWell(
+                      onTap: () {
+                        pilihGalleryPO();
+                      },
+                      child: Text("Pilih Gallery"),
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        pilihKameraPO();
+                      },
+                      child: Text("Pilih Kamera"),
+                    )
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  dialogPilihSrt() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: ListView(
+              padding: EdgeInsets.all(20),
+              shrinkWrap: true,
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    "Silahkan Pilih gambar",
+                    style:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    InkWell(
+                      onTap: () {
+                        pilihGallerySrt();
+                      },
+                      child: Text("Pilih Gallery"),
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        pilihKameraSrt();
+                      },
+                      child: Text("Pilih Kamera"),
+                    )
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  uploadFoto()async{
+    try{
+      // var stream = http.ByteStream(Deleg)
+    } catch(e){
+
     }
-    String fileName = tmpFile.path.split('/').last;
-    upload(fileName);
-  }
-
-  upload(String fileName) {
-    http.post("url");
   }
 
   @override
@@ -61,11 +159,39 @@ class _UploadSrtJlState extends State<UploadSrtJl> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Container(
-                    height: MediaQuery.of(context).size.height / 1.8,
-                    decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10))),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text("Upload PO Number / Order number"),
+                ),
+                InkWell(
+                  onTap: () => dialogPilihPO(),
+                  child: _imageFilePO == null
+                      ? Container(
+                          height: MediaQuery.of(context).size.height / 1.8,
+                          decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10)))
+                      : Image.file(
+                          _imageFilePO,
+                          fit: BoxFit.fill,
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text("Upload surat jalan"),
+                ),
+                InkWell(
+                  child: _imageFileSrt == null
+                      ? Container(
+                          height: MediaQuery.of(context).size.height / 1.8,
+                          decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10)))
+                      : Image.file(
+                          _imageFileSrt,
+                          fit: BoxFit.fill,
+                        ),
+                ),
                 Padding(
                   padding: EdgeInsets.only(top: 20, left: 10, right: 10),
                   child: GestureDetector(
