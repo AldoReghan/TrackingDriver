@@ -5,6 +5,7 @@ import 'package:tracking_driver/tidakAdaTugas.dart';
 import 'package:tracking_driver/uploadFoto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,6 +39,30 @@ class _TugasAktifState extends State<TugasAktif> {
   int driverId;
   int orderId;
   String messageAdmin;
+  String _currentPosition;
+
+  getLocation(){
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+    .then((Position position){
+      setState(() {
+        _currentPosition = position.toString();
+        if (_currentPosition != null) {
+          print(_currentPosition);
+        }
+      });
+    }).catchError((e){
+      print(e);
+    });
+  }
+
+  updateLanglit()async{
+    final response = await http.post("http://app.rasc.id/log/api/driver/getlocation", body: {
+      "DriverId" : driverId.toString(),
+      "LangLit" : _currentPosition
+    });
+    jsonDecode(response.body);
+  }
 
   Future<String> getData() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -51,10 +76,10 @@ class _TugasAktifState extends State<TugasAktif> {
       status = data[0]['Status'];
       driverId = data[0]['DriverId'];
       orderId = data[0]['OrderId'];
-      // messageAdmin = data[0]['Message'];
     });
     print(data);
     print("ini status " + status.toString());
+    print("ini driver " + driverId.toString());
     return "Success!";
   }
 
@@ -122,7 +147,8 @@ class _TugasAktifState extends State<TugasAktif> {
     if (id == null) {
       print("id kosong");
     } else {
-      print(id);
+      // print(id);
+      return true;
     }
   }
 
@@ -303,15 +329,19 @@ class _TugasAktifState extends State<TugasAktif> {
                         if (status == 2) {
                           rondo = "Driver telah mengangkut barang";
                           updateStatus(rondo);
+                          updateLanglit();
                         } else if (status == 3) {
                           rondo = "Driver telah Sampai Tujuan";
                           updateStatus(rondo);
+                          updateLanglit();
                         } else if (status == 4) {
                           rondo = "Barang Sudah Sampai Tujuan";
                           updateStatus(rondo);
+                          updateLanglit();
                         } else if (status == 5) {
                           rondo = "Barang Sudah Diturunkan";
                           updateStatus(rondo);
+                          updateLanglit();
                         }
                       });
                       Navigator.of(context).pop();

@@ -134,7 +134,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        name22 == null ? CircularProgressIndicator() : name22,
+                        "${data[0]['Name']}",
                         style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
                     ),
@@ -195,7 +195,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "CD engkel",
+                        "${data[0]['Type']}",
                         style: TextStyle(
                           color: Colors.black,
                         ),
