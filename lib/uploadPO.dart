@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,34 +20,90 @@ class UploadFoto extends StatefulWidget {
 }
 
 class _UploadFotoState extends State<UploadFoto> {
-  Future<File> file;
+  Future<File> filePO, fileSrtJl;
   String status = '';
-  String base64Image;
-  File tmpFile;
+  String base64ImagePO, base64ImageSrtJl;
+  File tmpFilePO, tmpFileSrtJl;
   String errMessage = 'Error Uploading Image';
 
-  Future getImageCamera() async {
+  chooseImagePOCamera(){
     setState(() {
-      file = ImagePicker.pickImage(source: ImageSource.camera);
+      filePO = ImagePicker.pickImage(source: ImageSource.camera);
     });
   }
 
-  Future getImageGallery() async {
+  chooseImageSrtJlCamera(){
     setState(() {
-      file = ImagePicker.pickImage(source: ImageSource.gallery);
+      fileSrtJl = ImagePicker.pickImage(source: ImageSource.camera);
     });
   }
 
-  startUpload() {
-    if (null == tmpFile) {
-      return "gagal upload";
+  Widget showImagePO(){
+    return FutureBuilder<File>(
+      future: filePO,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot){
+        if (snapshot.connectionState == ConnectionState.done && null != snapshot.data) {
+          tmpFilePO= snapshot.data;
+          base64ImagePO = base64Encode(snapshot.data.readAsBytesSync());
+          return Flexible(
+            child: Image.file(snapshot.data, fit: BoxFit.fill,)
+          );
+        }else if(null != snapshot.error){
+          return const Text("error picking image", textAlign: TextAlign.center,);
+        }else{
+          return const Text("No image selected", textAlign: TextAlign.center,);
+        }
+      },
+    );
+  }
+
+  Widget showImageSrtJl(){
+    return FutureBuilder<File>(
+      future: fileSrtJl,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot){
+        if (snapshot.connectionState == ConnectionState.done && null != snapshot.data) {
+          tmpFileSrtJl= snapshot.data;
+          base64ImageSrtJl = base64Encode(snapshot.data.readAsBytesSync());
+          return Flexible(
+            child: Image.file(snapshot.data, fit: BoxFit.fill,)
+          );
+        }else if(null != snapshot.error){
+          return const Text("error picking image", textAlign: TextAlign.center,);
+        }else{
+          return const Text("No image selected", textAlign: TextAlign.center,);
+        }
+      },
+    );
+  }
+
+  startUpload(){
+    setState(() {
+      print("uploading image...");
+    });
+    if (null == tmpFilePO && null == tmpFileSrtJl) {
+      setState(() {
+        print("error message");
+      });
+      return;
     }
-    String fileName = tmpFile.path.split('/').last;
-    upload(fileName);
+    String fileNamePO = tmpFilePO.path.split('/').last;
+    String fileNameSrtJl = tmpFileSrtJl.path.split('/').last;
+    upload(fileNamePO, fileNameSrtJl);
   }
 
-  upload(String fileName) {
-    http.post("url");
+  upload(String fileNamePO, String fileNameSrtJl) {
+    http.post("http://app.rasc.id/log/api/driver/uploadimage", body: {
+      "PO_PHOTO" : base64ImagePO,
+      "SuratJalan_Photo" : base64ImageSrtJl
+    }).then((result){
+      setState(() {
+        result.statusCode == 200 ? result.body : errMessage;
+      });
+    }).catchError((error){
+      setState(() {
+        print(error);
+      });
+    });
   }
 
   @override
@@ -58,53 +115,39 @@ class _UploadFotoState extends State<UploadFoto> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Container(
-                    height: MediaQuery.of(context).size.height / 1.8,
-                    decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10))),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.description), hintText: 'Deskripsi'),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.monetization_on), hintText: 'Jumlah'),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 20, left: 10, right: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navigator.of(context).push(
-                      //     MaterialPageRoute(builder: (context) => Home()));
-                    },
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              child: Column(
+                children: [
+                  Text("import PO number atau Order number"),
+                  SizedBox(height: 20,),
+                  showImagePO(),
+                  SizedBox(height: 20,),
+                  Text("upload surat jalan"),
+                  showImageSrtJl(),
+                  GestureDetector(
+                    onTap: chooseImagePOCamera(),
                     child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.lightBlue,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                        child: Text(
-                          "UPLOAD FOTO",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
+                      child: Text("upload image PO"),
                     ),
                   ),
-                ),
-              ],
+                  GestureDetector(
+                    onTap: chooseImageSrtJlCamera(),
+                    child: Container(
+                      child: Text("upload image surat jalan"),
+                    ),
+                  ),
+                  SizedBox(height: 30,),
+                  GestureDetector(
+                    onTap: startUpload(),
+                    child: Container(
+                      child: Text("upload"),
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
+          )
         ));
   }
 }
