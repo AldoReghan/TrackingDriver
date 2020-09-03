@@ -33,9 +33,8 @@ class _HomeState extends State<Home> {
   final list = List<DriverDataModel>();
 
   SharedPreferences sharedPreferences;
-  String name22;
-  List data;
-
+  List data ;
+  
   Future<String> getData() async {
     sharedPreferences = await SharedPreferences.getInstance();
     int id = sharedPreferences.get('Id');
@@ -47,17 +46,15 @@ class _HomeState extends State<Home> {
     setState(() {
       //final name = sharedPreferences.getString('Name');
       data = json.decode(response.body);
-          print("cok iki data cekmenu");
-    print(data[0]['photo']);
 
       //print(data[0]['Photo']);
     });
-    return "Success!";
+    return "true";
   }
 
   cekMenu() {
     
-    if (data == null) {
+    if (data == null || data[0]['Status'] == null) {
       return Container(child: TidakAdaTugas());
     } else if (data[0]['Status'] == 0) {
       return Container(child: TerimaTugas());
@@ -69,7 +66,7 @@ class _HomeState extends State<Home> {
   }
   cekLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    print('septiangansbet');
+
     print(sharedPreferences.get('Id').toString());
     if (sharedPreferences.get('Id') == null) {
       return false;
@@ -107,6 +104,12 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("Pekerjaan Anda"),
         centerTitle: true,
+        actions: [
+          IconButton(icon: Icon(Icons.refresh), onPressed: (){
+            onRefres();
+          })
+
+        ],
       ),
       drawer: data != null ? Drawer(
         child: ListView(
@@ -121,7 +124,7 @@ class _HomeState extends State<Home> {
                   CircleAvatar(
                     radius: 50,
                     child:  Image.network(
-                      "http://app.rasc.id/log/${data[0]['Photo']}"),
+                      "http://app.rasc.id/log/${data[0]['Photo']}",errorBuilder: (context, url, error) => new Icon(Icons.error)),
                   ),
                   SizedBox(
                     height: 10,
@@ -202,7 +205,7 @@ class _HomeState extends State<Home> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "${data[0]['Type']}",
+                        "",
                         style: TextStyle(
                           color: Colors.black,
                         ),
@@ -271,7 +274,9 @@ class _HomeState extends State<Home> {
           ],
         ),
       ) : CircularProgressIndicator(),
-      body: Container(child: cekMenu(),),
+      body: RefreshIndicator
+      ( onRefresh: onRefres,
+        child: Container(child: cekMenu())),
       bottomNavigationBar: Container(
         height: 70,
         child: BottomAppBar(

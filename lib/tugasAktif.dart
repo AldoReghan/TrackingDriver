@@ -44,24 +44,47 @@ class _TugasAktifState extends State<TugasAktif> {
   int orderId;
   String messageAdmin;
   String _currentPosition;
-
-  static double lat = -6.105735647265721;
-  static double lat2 = 106.88647985458374;
+  String lat;
+  String lng;
+//  String cek1;
+ // String cek2;
+  static double langlitPenjemputan1;
+  static double langlitPenjemputan2;
+  static double langlitPengirimian1;
+  static double langlitPengirimian2;
 
   ///MAPS LAUNCHER
-  final sepgans = Coords(lat, lat2);
-  cekmaps() async {
+  var laPenjemputan ;
+  var laPengiriman ;
+  penjemputan() async {
     final availableMaps = await MapLauncher.installedMaps;
     print(availableMaps);
 
     await availableMaps.first.showMarker(
-      coords: sepgans,
-      title: "Ocean Beach",
+      coords: laPenjemputan,
+      title: "",
     );
     if (await MapLauncher.isMapAvailable(MapType.google)) {
       await MapLauncher.showMarker(
         mapType: MapType.google,
-        coords: sepgans,
+        coords: laPenjemputan,
+        title: "title",
+        description: "description",
+      );
+    }
+  }
+  tujuan() async {
+    final availableMaps = await MapLauncher.installedMaps;
+    print(availableMaps);
+
+    await availableMaps.first.showMarker(
+      coords: laPengiriman,
+      title: "",
+    );
+    if (await MapLauncher.isMapAvailable(MapType.google)) {
+      await MapLauncher.showMarker(
+        mapType: MapType.google,
+        coords: laPengiriman,
         title: "title",
         description: "description",
       );
@@ -75,6 +98,8 @@ class _TugasAktifState extends State<TugasAktif> {
         .then((Position position) {
       setState(() {
         _currentPosition = position.toString();
+        lat = position.latitude.toString();
+        lng = position.longitude.toString();
         if (_currentPosition != null) {
           print(_currentPosition);
         }
@@ -85,10 +110,17 @@ class _TugasAktifState extends State<TugasAktif> {
   }
 
   updateLanglit() async {
-    final response = await http.post(
-        "http://app.rasc.id/log/api/driver/getlocation",
-        body: {"DriverId": driverId.toString(), "LangLit": _currentPosition});
-    jsonDecode(response.body);
+    
+    http.Response response = await http.post(
+      Uri.encodeFull("http://app.rasc.id/log/api/driver/getlocation"),
+      body: {
+        "DriverId" : driverId.toString(),
+        "Lat" : lat.toString(),
+        "Lng" : lng.toString()
+      },
+    );
+    print(response.body);
+    return "Success!";
   }
 
   Future<String> getData() async {
@@ -100,6 +132,21 @@ class _TugasAktifState extends State<TugasAktif> {
     );
     setState(() {
       data = jsonDecode(response.body);
+      var cek1 = data[0]['LangLitPenjemputan'].split(",");
+      var cek2 = cek1[0].split("(");
+      var cek3 = cek1[1].split(")");
+      langlitPenjemputan1 = double.parse(cek2[1]);
+      langlitPenjemputan2 = double.parse(cek3[0]);
+      laPenjemputan = Coords(langlitPenjemputan1, langlitPenjemputan2);
+
+      var cek11 = data[0]['LangLitPengiriman'].split(",");
+      var cek22 = cek11[0].split("(");
+      var cek33 = cek11[1].split(")");
+      langlitPengirimian1 = double.parse(cek22[1]);
+      langlitPengirimian2 = double.parse(cek33[0]);
+      laPengiriman = Coords(langlitPengirimian1, langlitPengirimian2);
+
+      print(langlitPenjemputan1);
       status = data[0]['Status'];
       driverId = data[0]['DriverId'];
       orderId = data[0]['OrderId'];
@@ -217,7 +264,7 @@ class _TugasAktifState extends State<TugasAktif> {
                           updateStatus(rondo);
                           updateLanglit();
                         }else{
-                          status = status + 1;
+                          
                           rondo = "Tugas telah selesai";
                           updateStatus(rondo);
                           updateLanglit();
@@ -270,7 +317,7 @@ class _TugasAktifState extends State<TugasAktif> {
 
   antarBawa() {
     return Container(
-      height: status == 1 ? 475 : 475,
+      height: status == 1 ? 500 : 500,
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
@@ -292,7 +339,7 @@ class _TugasAktifState extends State<TugasAktif> {
               ),
               GestureDetector(
                 onTap: () {
-                  cekmaps();
+                  tujuan();
                 },
                 child: Container(
                   margin: EdgeInsets.only(top: 5),
@@ -315,12 +362,12 @@ class _TugasAktifState extends State<TugasAktif> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                "${data[0]['TujuanBarang']}",
+                "${data[0]['PenjemputanBarang']}",
                 style: TextStyle(color: Colors.grey),
               ),
               GestureDetector(
                 onTap: () {
-                  cekmaps();
+                  penjemputan();
                 },
                 child: Container(
                   margin: EdgeInsets.only(top: 5),
@@ -980,8 +1027,10 @@ class _TugasAktifState extends State<TugasAktif> {
   @override
   void initState() {
     super.initState();
+    
     getData();
     cekDriverId();
+    getLocation();
   }
 
   @override

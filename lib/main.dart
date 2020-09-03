@@ -37,6 +37,9 @@ class _MainHomeState extends State<MainHome> {
   SharedPreferences sharedPreferences;
   bool _isloggedin ;
   String _currentPosition;
+  String lat;
+  String lng;
+
   int driverId;
   List data;
 
@@ -46,6 +49,8 @@ class _MainHomeState extends State<MainHome> {
     .then((Position position){
       setState(() {
         _currentPosition = "${position.latitude}, ${position.longitude}";
+        lat = position.latitude.toString();
+        lng = position.longitude.toString();
         if (_currentPosition != null) {
           print(_currentPosition);
           getData();
@@ -81,7 +86,8 @@ updateLanglit() async {
       Uri.encodeFull("http://app.rasc.id/log/api/driver/getlocation"),
       body: {
         "DriverId" : driverId.toString(),
-        "LangLit" : _currentPosition.toString(),
+        "Lat" : lat.toString(),
+        "Lng" : lng.toString()
       },
     );
     print(response.body);
